@@ -12,6 +12,7 @@ def help():
     print(" repo - show current git repository")
     print(" add-file [FILE PATH] - add file to storage")
     print(" rm-file [FILE NAME] - remove file from storage")
+    print(" files - show your stored files")
     print(" pull - pull your config files from remote repository and replace your current files with downloaded")
     print(" push - push your saved config files to remote repository")
 
@@ -104,10 +105,23 @@ def pull():
     cmd = "cd "+configDir+"files/ && git fetch --all; git reset --hard origin/master"
     subprocess.call(cmd, shell=True)
 
-    lines = open(configDir + "files/locations").read().split('\n')
+    locations = open(configDir + "files/locations");
+    lines = locations.read().split('\n')
+    locations.close()
 
     for i in range(1, len(lines), 2):
        copy_file(add_username(lines[i]), lines[i-1], False)
+
+def show_files():
+    locations = open(configDir + "files/locations");
+    lines = locations.read().split('\n')
+    locations.close()
+
+    for i in range(1, len(lines), 2):
+        print(lines[i-1] + ": "+lines[i])
+
+    if len(lines) == 1 or len(lines) == 0:
+        print("You have no saved files")
 
 if len(sys.argv) == 3:
     if sys.argv[1] == "set-repo":
@@ -124,5 +138,7 @@ elif len(sys.argv) == 2:
         push()
     elif sys.argv[1] == "pull":
         pull()
+    elif sys.argv[1] == "files":
+        show_files()
     else: help()
 else: help()
