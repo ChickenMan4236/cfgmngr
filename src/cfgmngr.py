@@ -5,6 +5,16 @@ import subprocess
 import os
 import shutil
 
+def help():
+    print("Usage: cfgmngr [ACTION] [OPTION]")
+    print("Actions:")
+    print(" set-repo [URL] - add remote git repository to store your configs")
+    print(" repo - show current git repository")
+    print(" add-file [FILE PATH] - add file to storage")
+    print(" rm-file [FILE NAME] - remove file from storage")
+    print(" pull - pull your config files from remote repository and replace your current files with downloaded")
+    print(" push - push your saved config files to remote repository")
+
 configDir = "/home/"+os.getlogin()+"/.config/cfgmngr/"
 
 if not os.path.exists(configDir):
@@ -99,8 +109,6 @@ def pull():
     for i in range(1, len(lines), 2):
        copy_file(add_username(lines[i]), lines[i-1], False)
 
-
-
 if len(sys.argv) == 3:
     if sys.argv[1] == "set-repo":
         set_repo(sys.argv[2]) 
@@ -108,6 +116,7 @@ if len(sys.argv) == 3:
         add_file(sys.argv[2])
     elif sys.argv[1] == "rm-file":
         rm_file(sys.argv[2])
+    else: help()
 elif len(sys.argv) == 2:
     if sys.argv[1] == "repo":
         get_repo()
@@ -115,3 +124,5 @@ elif len(sys.argv) == 2:
         push()
     elif sys.argv[1] == "pull":
         pull()
+    else: help()
+else: help()
