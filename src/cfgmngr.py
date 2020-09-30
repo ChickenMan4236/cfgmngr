@@ -5,6 +5,8 @@ import subprocess
 import os
 import shutil
 
+FNULL = open(os.devnull, "w")
+
 def help():
     print("Usage: cfgmngr [ACTION] [OPTION]")
     print("Actions:")
@@ -27,12 +29,26 @@ if not os.path.exists(configDir + "files/"):
 if not os.path.exists(configDir + "files/locations"):
     open(configDir + "files/locations", "w").close()
 
+def test_repo():
+    print("Testing repository")
+    cmd = "cd ~/.config/cfgmngr/files && git ls-remote" 
+    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    if res == 0: print("Fine")
+    return res == 0
+
+def repo_err():
+    print("Cant connect to repository")
+
 def set_repo(repo):
     cmd = "cd ~/.config/cfgmngr/files && git remote rm origin; git init; git remote add origin "+repo
-    subprocess.call(cmd, shell=True)
+    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    if res != 0:
+       repo_err()
+       return
 def get_repo():
     cmd = "cd "+configDir+"files/ && git remote -v"
     subprocess.call(cmd, shell=True)
+
 def check_exists(fileName):
     try:
         file = open(os.getcwd() +"/"+ fileName)
@@ -90,6 +106,7 @@ def copy_file(path, name, toConfig):
         shutil.copy(configDir+"files/"+name, path)
 
 def push():
+    print("Packing files")
     locations = open(configDir + "files/locations");
     lines = locations.read().split('\n')
     locations.close()
@@ -97,20 +114,34 @@ def push():
     for i in range(1, len(lines), 2):
        copy_file(add_username(lines[i]), lines[i-1], True)
 
+    print("Uploading files")
+
     cmd = "cd "+configDir+"files/"+" && git add . && git commit -m \"test\"; git push -u origin master"
 
-    subprocess.call(cmd, shell=True)
+    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    if res != 0:
+        repo_err()
+
+    print("Done")
 
 def pull():
-    cmd = "cd "+configDir+"files/ && git fetch --all; git reset --hard origin/master"
-    subprocess.call(cmd, shell=True)
+    print("Downloading files")
 
+    cmd = "cd "+configDir+"files/ && git fetch --all; git reset --hard origin/master"
+    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    if res != 0:
+        repo_err()
+        return
+
+    print("Moving files")
     locations = open(configDir + "files/locations");
     lines = locations.read().split('\n')
     locations.close()
 
     for i in range(1, len(lines), 2):
        copy_file(add_username(lines[i]), lines[i-1], False)
+
+    print("Done")
 
 def show_files():
     locations = open(configDir + "files/locations");
@@ -135,8 +166,14 @@ elif len(sys.argv) == 2:
     if sys.argv[1] == "repo":
         get_repo()
     elif sys.argv[1] == "push":
+        if not test_repo():
+            repo_err()
+            exit()
         push()
     elif sys.argv[1] == "pull":
+        if not test_repo():
+            repo_err()
+            exit()
         pull()
     elif sys.argv[1] == "files":
         show_files()
