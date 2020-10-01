@@ -11,7 +11,7 @@ Simply clone this repository, go to `src/` and use `make`. Now you can use cfgmn
 
 ## How to use?
 #### Git repository
-> First you have to specify where to store your files. You can create a private repository on github or another service and then set url to repository in cfgmngr:
+> At first you have to specify where to store your files. You can create a private repository on github or another service and then set url to repository in cfgmngr:
 - `cfgmngr set-repo [URL]`
 > You can check your current repository URL by typing:
 - `cfgmngr repo`
