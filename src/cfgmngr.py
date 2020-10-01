@@ -26,6 +26,9 @@ if not os.path.exists(configDir):
 if not os.path.exists(configDir + "files/"):
     os.makedirs(configDir + "files/")
 
+if not os.path.exists(configDir + "backup/"):
+    os.makedirs(configDir + "backup/")
+
 if not os.path.exists(configDir + "files/locations"):
     open(configDir + "files/locations", "w").close()
 
@@ -104,6 +107,9 @@ def copy_file(path, name, toConfig):
         shutil.copy(path, configDir+"files/"+name)
     else:
         shutil.copy(configDir+"files/"+name, path)
+def backup_file(path, name):
+    if os.path.exists(path):
+        shutil.copy(path, configDir+"backup/"+name) 
 
 def push():
     print("Packing files")
@@ -139,7 +145,8 @@ def pull():
     locations.close()
 
     for i in range(1, len(lines), 2):
-       copy_file(add_username(lines[i]), lines[i-1], False)
+        backup_file(add_username(lines[i]), lines[i-1])
+        copy_file(add_username(lines[i]), lines[i-1], False)
 
     print("Done")
 
