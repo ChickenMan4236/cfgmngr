@@ -25,9 +25,10 @@ Simply clone this repository, go to `src/` and use `make`. Now you can use cfgmn
 #### Sync
 > When you already have some files in storage, you can push them to you repository:
 - `cfgmngr push`
-> To pull them, you must have just specified repository, and then you can type:
+> :warning: Note that all pulled files will overwrite your current configuration files!
+> To pull them, you must have specified repository, and then you can type:
 - `cfgmngr pull` 
-> Note that all pulled files will overwrite your current configuration files!
+> Cfgmngr stores backup of your files from last pull. You can find them in `~/.config/cfgmngr/backup/`
 
 ## License
 
