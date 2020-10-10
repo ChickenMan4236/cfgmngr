@@ -33,9 +33,27 @@ if not os.path.exists(configDir + "backup/"):
 if not os.path.exists(configDir + "files/locations"):
     open(configDir + "files/locations", "w").close()
 
+
+#Path actions
+
+def add_username(path):
+    return path.replace("$USER$", os.getlogin())
+
+def remove_username(path):
+    if(not path.startswith("/home/")):
+        return path
+    return "/home/$USER$/"+path[len(os.getlogin())+7:]
+
+def remove_tilde(path):
+    if(path.startswith("~")):
+        return "/home/"+os.getlogin()+"/"+path[1:]
+    return path
+
+#Repo actions
+
 def test_repo():
     print("Testing repository")
-    cmd = "cd ~/.config/cfgmngr/files && git ls-remote" 
+    cmd = "cd ~/.config/cfgmngr/files && git ls-remote"
     res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
     if res == 0: print("Fine")
     return res == 0
@@ -53,6 +71,8 @@ def get_repo():
     cmd = "cd "+configDir+"files/ && git remote -v"
     subprocess.call(cmd, shell=True)
 
+#File actions
+
 def check_exists(fileName):
     try:
         if fileName.startswith('/'):
@@ -60,18 +80,10 @@ def check_exists(fileName):
         else:
             file = open(os.getcwd() +"/"+ fileName)
     except IOError:
-       return False 
+       return False
     else:
         file.close()
     return True
-
-def remove_username(path):
-    if(not path.startswith("/home/")):
-        return path
-    return "/home/$USER$/"+path[len(os.getlogin())+7:]
-
-def add_username(path):
-    return path.replace("$USER$", os.getlogin())
 
 def save_file(fileName, customName):
     locations = open(configDir + "files/locations", "a")
@@ -80,7 +92,7 @@ def save_file(fileName, customName):
         path = fileName
     else:
         path = os.getcwd()+"/"+fileName
-    locations.write(remove_username(fileName)+"\n")
+    locations.write(remove_username(path)+"\n")
     locations.close()
     print("File saved")
 
@@ -105,6 +117,8 @@ def rm_file(fileName):
     subprocess.call(cmd, shell=True)
 
 def add_file(fileName, customName):
+    fileName = remove_tilde(fileName)
+
     if(customName == None):
         customName = fileName
     if check_exists(fileName):
