@@ -13,6 +13,7 @@ def help():
     print(" set-repo [URL] - add remote git repository to store your configs")
     print(" repo - show current git repository")
     print(" add-file [FILE PATH] - add file to storage")
+    print(" add-file [CUSTOM NAME] [FILE PATH] - add file to storage with custom name")
     print(" rm-file [FILE NAME] - remove file from storage")
     print(" files - show your stored files")
     print(" pull - pull your config files from remote repository and replace your current files with downloaded")
@@ -69,9 +70,9 @@ def remove_username(path):
 def add_username(path):
     return path.replace("$USER$", os.getlogin())
 
-def save_file(fileName):
+def save_file(fileName, customName):
     locations = open(configDir + "files/locations", "a")
-    locations.write(os.path.basename(fileName)+"\n")
+    locations.write(os.path.basename(customName)+"\n")
     locations.write(remove_username(os.getcwd()+"/"+fileName)+"\n")
     locations.close()
     print("File saved")
@@ -84,7 +85,7 @@ def unsave_file(fileName):
 
     for i in range(1, len(lines), 2):
         if lines[i-1] != fileName:
-            newLines += lines[i-1] + lines[i]
+            newLines += lines[i-1] + '\n' + lines[i] + '\n'
 
     locations = open(configDir + "files/locations", "w");
     locations.write(newLines)
@@ -96,9 +97,11 @@ def rm_file(fileName):
     cmd = "cd "+configDir+"files/ && rm "+fileName
     subprocess.call(cmd, shell=True)
 
-def add_file(fileName):
+def add_file(fileName, customName):
+    if(customName == None):
+        customName = fileName
     if check_exists(fileName):
-        save_file(fileName)
+        save_file(fileName, customName)
     else:
        print("There is no file like this")
 
@@ -163,9 +166,9 @@ def show_files():
 
 if len(sys.argv) == 3:
     if sys.argv[1] == "set-repo":
-        set_repo(sys.argv[2]) 
+        set_repo(sys.argv[2])
     elif sys.argv[1] == "add-file":
-        add_file(sys.argv[2])
+        add_file(sys.argv[2], None)
     elif sys.argv[1] == "rm-file":
         rm_file(sys.argv[2])
     else: help()
@@ -184,5 +187,9 @@ elif len(sys.argv) == 2:
         pull()
     elif sys.argv[1] == "files":
         show_files()
+    else: help()
+elif len(sys.argv) == 4:
+    if sys.argv[1] == "add-file":
+        add_file(sys.argv[3], sys.argv[2])
     else: help()
 else: help()

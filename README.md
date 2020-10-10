@@ -18,6 +18,8 @@ Simply clone this repository, go to `src/` and use `make`. Now you can use cfgmn
 #### Files
 > When you set your github repository, you can add files, that you want to store:
 - `cfgmngr add-file [PATH TO FILE]`
+> Your files will be stored in one directory so they should have unique names. When you have to add multiple files with same names, you should set custom names for theese files:
+- `cfgmngr add-file [CUSTOM NAME] [PATH TO FILE]`
 > To see what files are currently stored you can type:
 - `cfgmngr files`
 > If you want to remove a file from storage simply type:
