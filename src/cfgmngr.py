@@ -70,7 +70,7 @@ def add_username(path):
     return path.replace("$USER$", os.getlogin())
 
 def save_file(fileName):
-    locations = open(configDir + "files/locations", "w")
+    locations = open(configDir + "files/locations", "a")
     locations.write(os.path.basename(fileName)+"\n")
     locations.write(remove_username(os.getcwd()+"/"+fileName)+"\n")
     locations.close()
