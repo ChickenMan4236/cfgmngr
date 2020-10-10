@@ -6,33 +6,7 @@ import os
 import shutil
 
 FNULL = open(os.devnull, "w")
-
-def help():
-    print("Usage: cfgmngr [ACTION] [OPTION]")
-    print("Actions:")
-    print(" set-repo [URL] - add remote git repository to store your configs")
-    print(" repo - show current git repository")
-    print(" add-file [FILE PATH] - add file to storage")
-    print(" add-file [CUSTOM NAME] [FILE PATH] - add file to storage with custom name")
-    print(" rm-file [FILE NAME] - remove file from storage")
-    print(" files - show your stored files")
-    print(" pull - pull your config files from remote repository and replace your current files with downloaded")
-    print(" push - push your saved config files to remote repository")
-
 configDir = "/home/"+os.getlogin()+"/.config/cfgmngr/"
-
-if not os.path.exists(configDir):
-    os.makedirs(configDir)
-
-if not os.path.exists(configDir + "files/"):
-    os.makedirs(configDir + "files/")
-
-if not os.path.exists(configDir + "backup/"):
-    os.makedirs(configDir + "backup/")
-
-if not os.path.exists(configDir + "files/locations"):
-    open(configDir + "files/locations", "w").close()
-
 
 #Path actions
 
@@ -61,12 +35,6 @@ def test_repo():
 def repo_err():
     print("Cant connect to repository")
 
-def set_repo(repo):
-    cmd = "cd ~/.config/cfgmngr/files && git remote rm origin; git init; git remote add origin "+repo
-    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-    if res != 0:
-       repo_err()
-       return
 def get_repo():
     cmd = "cd "+configDir+"files/ && git remote -v"
     subprocess.call(cmd, shell=True)
@@ -110,22 +78,6 @@ def unsave_file(fileName):
     locations.write(newLines)
     locations.close()
 
-
-def rm_file(fileName):
-    unsave_file(fileName)
-    cmd = "cd "+configDir+"files/ && rm "+fileName
-    subprocess.call(cmd, shell=True)
-
-def add_file(fileName, customName):
-    fileName = remove_tilde(fileName)
-
-    if(customName == None):
-        customName = fileName
-    if check_exists(fileName):
-        save_file(fileName, customName)
-    else:
-       print("There is no file like this")
-
 def copy_file(path, name, toConfig):
     if toConfig:
         shutil.copy(path, configDir+"files/"+name)
@@ -135,24 +87,18 @@ def backup_file(path, name):
     if os.path.exists(path):
         shutil.copy(path, configDir+"backup/"+name) 
 
-def push():
-    print("Packing files")
+#Command actions
+
+def show_files():
     locations = open(configDir + "files/locations");
     lines = locations.read().split('\n')
     locations.close()
 
     for i in range(1, len(lines), 2):
-       copy_file(add_username(lines[i]), lines[i-1], True)
+        print(lines[i-1] + ": "+lines[i])
 
-    print("Uploading files")
-
-    cmd = "cd "+configDir+"files/"+" && git add . && git commit -m \"test\"; git push -u origin master"
-
-    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-    if res != 0:
-        repo_err()
-
-    print("Done")
+    if len(lines) == 1 or len(lines) == 0:
+        print("You have no saved files")
 
 def pull():
     print("Downloading files")
@@ -174,43 +120,102 @@ def pull():
 
     print("Done")
 
-def show_files():
+def push():
+    print("Packing files")
     locations = open(configDir + "files/locations");
     lines = locations.read().split('\n')
     locations.close()
 
     for i in range(1, len(lines), 2):
-        print(lines[i-1] + ": "+lines[i])
+       copy_file(add_username(lines[i]), lines[i-1], True)
 
-    if len(lines) == 1 or len(lines) == 0:
-        print("You have no saved files")
+    print("Uploading files")
 
-if len(sys.argv) == 3:
-    if sys.argv[1] == "set-repo":
-        set_repo(sys.argv[2])
-    elif sys.argv[1] == "add-file":
-        add_file(sys.argv[2], None)
-    elif sys.argv[1] == "rm-file":
-        rm_file(sys.argv[2])
+    cmd = "cd "+configDir+"files/"+" && git add . && git commit -m \"test\"; git push -u origin master"
+
+    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    if res != 0:
+        repo_err()
+
+    print("Done")
+
+def rm_file(fileName):
+    unsave_file(fileName)
+    cmd = "cd "+configDir+"files/ && rm "+fileName
+    subprocess.call(cmd, shell=True)
+
+def add_file(fileName, customName):
+    fileName = remove_tilde(fileName)
+
+    if(customName == None):
+        customName = fileName
+    if check_exists(fileName):
+        save_file(fileName, customName)
+    else:
+       print("There is no file like this")
+
+def set_repo(repo):
+    cmd = "cd ~/.config/cfgmngr/files && git remote rm origin; git init; git remote add origin "+repo
+    res = subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    if res != 0:
+       repo_err()
+       return
+
+def help():
+    print("Usage: cfgmngr [ACTION] [OPTION]")
+    print("Actions:")
+    print(" set-repo [URL] - add remote git repository to store your configs")
+    print(" repo - show current git repository")
+    print(" add-file [FILE PATH] - add file to storage")
+    print(" add-file [CUSTOM NAME] [FILE PATH] - add file to storage with custom name")
+    print(" rm-file [FILE NAME] - remove file from storage")
+    print(" files - show your stored files")
+    print(" pull - pull your config files from remote repository and replace your current files with downloaded")
+    print(" push - push your saved config files to remote repository")
+
+#Main
+
+def main():
+    if not os.path.exists(configDir):
+        os.makedirs(configDir)
+
+    if not os.path.exists(configDir + "files/"):
+        os.makedirs(configDir + "files/")
+
+    if not os.path.exists(configDir + "backup/"):
+        os.makedirs(configDir + "backup/")
+
+    if not os.path.exists(configDir + "files/locations"):
+        open(configDir + "files/locations", "w").close()
+
+    if len(sys.argv) == 3:
+        if sys.argv[1] == "set-repo":
+            set_repo(sys.argv[2])
+        elif sys.argv[1] == "add-file":
+            add_file(sys.argv[2], None)
+        elif sys.argv[1] == "rm-file":
+            rm_file(sys.argv[2])
+        else: help()
+    elif len(sys.argv) == 2:
+        if sys.argv[1] == "repo":
+            get_repo()
+        elif sys.argv[1] == "push":
+            if not test_repo():
+                repo_err()
+                exit()
+            push()
+        elif sys.argv[1] == "pull":
+            if not test_repo():
+                repo_err()
+                exit()
+            pull()
+        elif sys.argv[1] == "files":
+            show_files()
+        else: help()
+    elif len(sys.argv) == 4:
+        if sys.argv[1] == "add-file":
+            add_file(sys.argv[3], sys.argv[2])
+        else: help()
     else: help()
-elif len(sys.argv) == 2:
-    if sys.argv[1] == "repo":
-        get_repo()
-    elif sys.argv[1] == "push":
-        if not test_repo():
-            repo_err()
-            exit()
-        push()
-    elif sys.argv[1] == "pull":
-        if not test_repo():
-            repo_err()
-            exit()
-        pull()
-    elif sys.argv[1] == "files":
-        show_files()
-    else: help()
-elif len(sys.argv) == 4:
-    if sys.argv[1] == "add-file":
-        add_file(sys.argv[3], sys.argv[2])
-    else: help()
-else: help()
+
+main()
