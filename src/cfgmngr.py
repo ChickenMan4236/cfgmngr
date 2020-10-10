@@ -55,7 +55,10 @@ def get_repo():
 
 def check_exists(fileName):
     try:
-        file = open(os.getcwd() +"/"+ fileName)
+        if fileName.startswith('/'):
+            file = open(fileName)
+        else:
+            file = open(os.getcwd() +"/"+ fileName)
     except IOError:
        return False 
     else:
@@ -73,7 +76,11 @@ def add_username(path):
 def save_file(fileName, customName):
     locations = open(configDir + "files/locations", "a")
     locations.write(os.path.basename(customName)+"\n")
-    locations.write(remove_username(os.getcwd()+"/"+fileName)+"\n")
+    if(fileName.startswith('/')):
+        path = fileName
+    else:
+        path = os.getcwd()+"/"+fileName
+    locations.write(remove_username(fileName)+"\n")
     locations.close()
     print("File saved")
 
