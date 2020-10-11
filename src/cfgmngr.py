@@ -188,6 +188,14 @@ def help():
     print(" pull - pull your config files from remote repository and replace your current files with downloaded")
     print(" push - push your saved config files to remote repository")
 
+#Readme
+def generate_readme():
+    readme = open(configDir + "files/README.MD", "w");
+    readme.write("# ![](https://github.com/ChickenMan4236/cfgmngr/blob/master/logoFull.png)\n")
+    readme.write("## Theese dotfiles have been uploaded with [cfgmngr](https://github.com/ChickenMan4236/cfgmngr)\n")
+    readme.write("### [cfgmngr](https://github.com/ChickenMan4236/cfgmngr) is a simple tool, that makes storing your dotfiles on github easier\n")
+    readme.close()
+
 #Main
 
 def main():
@@ -218,6 +226,7 @@ def main():
             if not test_repo():
                 repo_err()
                 exit()
+            generate_readme()
             push()
         elif sys.argv[1] == "pull":
             if not test_repo():
