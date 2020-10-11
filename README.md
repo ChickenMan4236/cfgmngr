@@ -1,5 +1,8 @@
 # ![](logoFull.png)
 
+## Contributions
+All contributions are welcome in this repository!
+
 ## About
 Cfgmngr is a simple tool to store your dotfiles on github. 
 With cfgmngr you can add files to be tracked just one time. You dont have to copy them one after another to proper locations, cfgmngr will do it for you!
