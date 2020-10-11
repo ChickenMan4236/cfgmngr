@@ -1,10 +1,8 @@
-# cfgmngr
+# ![](logoFull.png)
 
 ## About
-Cfgmngr is a simple tool to keep your system config files up to date. 
-With cfgmngr you can synchronize your config files with theese from previous installation or from another computer.
-You can specify which config files should be stored. Cfgmngr will pack them together to one directory and push them
-to git repository. Then you can pull them to another computer and cfgmngr will automatically copy them to proper locations.
+Cfgmngr is a simple tool to store your dotfiles on github. 
+With cfgmngr you can add files to be tracked just one time. You dont have to copy them one after another to proper locations, cfgmngr will do it for you!
 
 ## Installation
 Simply clone this repository, go to `src/` and use `make`. Now you can use cfgmngr by simply typing `cfgmngr` in terminal.
