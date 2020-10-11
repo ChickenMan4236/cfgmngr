@@ -53,6 +53,16 @@ def check_exists(fileName):
         file.close()
     return True
 
+def check_already_saved(customName):
+    locations = open(configDir + "files/locations");
+    lines = locations.read().split('\n')
+    locations.close()
+
+    for i in range(1, len(lines), 2):
+        if lines[i-1] == customName:
+            return True
+    return False
+
 def save_file(fileName, customName):
     locations = open(configDir + "files/locations", "a")
     locations.write(os.path.basename(customName)+"\n")
@@ -141,7 +151,7 @@ def push():
 
 def rm_file(fileName):
     unsave_file(fileName)
-    cmd = "cd "+configDir+"files/ && rm "+fileName
+    cmd = "cd "+configDir+"files/ && rm -f "+fileName
     subprocess.call(cmd, shell=True)
 
 def add_file(fileName, customName):
@@ -149,6 +159,11 @@ def add_file(fileName, customName):
 
     if(customName == None):
         customName = fileName
+
+    if check_already_saved(customName):
+        print("This filename is alredy taken. Try using custom name for this file.")
+        return
+
     if check_exists(fileName):
         save_file(fileName, customName)
     else:
