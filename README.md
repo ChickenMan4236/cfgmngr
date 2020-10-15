@@ -8,7 +8,10 @@ Cfgmngr is a simple tool to store your dotfiles on github.
 With cfgmngr you can add files to be tracked just one time. You dont have to copy them one after another to proper locations, cfgmngr will do it for you!
 
 ## Installation
-Simply clone this repository, go to `src/` and use `make`. Now you can use cfgmngr by simply typing `cfgmngr` in terminal.
+`git clone https://github.com/ChickenMan4236/cfgmngr`
+`cd cfgmngr`
+`sudo make install`
+- And now you can use cfgmngr by typing `cfgmngr` or `cfgm` in your terminal
 
 ## How to use?
 #### Git repository
