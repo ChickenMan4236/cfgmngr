@@ -10,4 +10,4 @@ install:
 	cp LICENSE.md /opt/cfgmngr/LICENSE.md
 	cp src/cfgmngr.sh /usr/bin/cfgmngr
 	sudo chmod +x /usr/bin/cfgmngr
-	ln /usr/bin/cfgmngr /usr/bin/cfgm
+	ln -f /usr/bin/cfgmngr /usr/bin/cfgm
